@@ -1,0 +1,173 @@
+:root {
+  --background: #fbf8f3;
+  --foreground: #171717;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  width: 100%; /* vw includes width of vertical scrollbar */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  padding-right: 0 !important;
+}
+
+.background-image-container {
+  position: fixed;
+  top: 0;
+  right: -20%;
+  bottom: -50%;
+  left: 0;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.background-image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.inline-list li {
+  margin-left: 42px;
+}
+
+.header-link-em {
+  text-transform: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.profile-img {
+  border-radius: 100%;
+}
+
+.cover-img {
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+}
+
+.therapist-card,
+.resources-card {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.therapist-card:not(:has(.no-parent-hover:hover)):hover,
+.resources-card:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+  background-color: #e9f3fb !important;
+}
+
+.therapist-card:not(:has(.no-parent-hover:hover)):hover .view-profile-btn {
+  background-color: #ff9900;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse {
+  animation: pulse 400ms 2500ms ease-in-out;
+}
+
+.pulse-delay {
+  animation: pulse 300ms 2900ms ease-in-out;
+}
+
+.sticky-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-100%);
+  transition: transform 0.15s ease-in-out;
+  z-index: 2000;
+  background-color: #0a3449;
+}
+
+.sticky-header.visible {
+  transform: translateY(0);
+}
+
+.mobile-nav-link {
+  color: #ff9900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+
+.payload-richtext a {
+  color: blue;
+}
+
+.payload-richtext a:hover {
+  text-decoration: underline;
+}
+
+.site-footer {
+  background-color: rgba(10, 52, 73, 0.8);
+  color: #ff9900;
+  margin-top: auto;
+  border-top: solid 1px rgba(255, 255, 255, 0.3);
+}
+
+.footer-nav-list div {
+  border-radius: 4px;
+}
+
+.media-block,
+.media-block img,
+.media-block video {
+  max-width: 100%;
+  height: auto;
+}

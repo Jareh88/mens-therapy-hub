@@ -1,0 +1,20 @@
+.header-link.nav-btn {
+  display: inline-flex !important;
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+
+.header-link {
+  display: none !important;
+  font-size: 16px !important;
+}
+
+@media (min-width: 1200px) {
+  .header-link {
+    display: inline-flex !important;
+  }
+  .header-link.nav-btn {
+    display: none !important;
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // "types": ["jest", "jest-dom/extend-expect"]
+    "types": ["jest", "@testing-library/jest-dom"]
+  },
+  "include": ["**/*.test.ts", "**/*.test.tsx"]
+}
