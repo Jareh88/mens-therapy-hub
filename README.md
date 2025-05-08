@@ -1,132 +1,170 @@
-# Men’s Therapy Hub
+# Men's Therapy Hub
 
-A modern directory platform connecting men with therapists. Built using a modern stack for performance, scalability, and maintainability. This document serves as a developer handover and setup reference.
+A modern directory that helps men find the right therapist - built with **Next 15 / React 19**, **Payload CMS**, **PostgreSQL** and **MUI v6**.
 
----
-
-## 🧱 Tech Stack
-
-- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
-- **Styling**: Material-UI (MUI v6) with Emotion (SSR configured)
-- **CMS/Backend**: Payload CMS (headless)
-- **Database**: PostgreSQL
-- **Email**: Payload built-in mailer (Nodemailer), with potential for SendGrid/SMTP integration
-- **Deployment Target**: Vercel currently
+The repo is structured as a **single Next.js project** that _embeds_ Payload (no separate server).  
+Everything - marketing pages, therapists, blog posts - is stored in Payload and surfaced via typed GraphQL / REST and direct server‑calls (`req.payload`).
 
 ---
 
-## 📦 Requirements
-
-- Node.js `22.x` or newer
-- PostgreSQL instance (local or cloud-hosted)
-- npm for dependency management
-
----
-
-## 🛠️ Local Setup
-
-### 1. Clone the Repository
+## ⚡️ Quick start
 
 ```bash
-git clone <url>
+git clone https://github.com/YourOrg/mth.git
 cd mth
-```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-# or
-yarn install
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env.local` file in the root directory and include the following:
-
-```env
-DATABASE_URL=postgres://username:password@localhost:5432/dbname
-PAYLOAD_SECRET=your-secret
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
-# For email support as required:
-EMAIL_FROM=no-reply@yourdomain.com
-EMAIL_TRANSPORT=nodemailer
-SMTP_HOST=smtp.yourmail.com
-SMTP_PORT=587
-SMTP_USER=your_username
-SMTP_PASS=your_password
-```
-
-> Replace values with your actual database and SMTP credentials.
-
----
-
-### 4. Generate Payload Types (Optional)
-
-If you've changed Payload collections/config:
-
-```bash
-npm run generate:types
+cp .env.example .env.local           # fill in the blanks
+npm i
+npm run dev                          # http://localhost:3000
 ```
 
 ---
 
-### 5. Start Development Server
+## 🗂️ Project layout
 
-```bash
-npm run dev
+```
+.
+├── src/
+│   ├── app/                      # Next.js 15 ‑ App Router
+│   │   ├── (frontend)/           # regular site routes
+│   │   ├── (payload)/admin/      # Payload Admin UI (iframe)
+│   │   └── api/                  # edge/serverless helpers
+│   ├── collections/              # Payload collections (TS)
+│   ├── components/               # shared React components
+│   ├── constants/                # design‑tokens, theme colours
+│   ├── lib/                      # client/server utilities
+│   ├── middleware.ts             # auth cookies → req.user
+│   └── types/                    # generated Payload types
+├── public/
+├── payload.config.ts             # bootstraps CMS & plugins
+├── jest.config.mjs
+└── vercel.json                   # (optional, can see potential choices in debuggingstagingvercel.json) build + edge/runtime opts
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+> **Generated types** live in `src/types` (`npm run generate:types`).
 
 ---
 
-## ✅ Feature Implementation Status
+## 🧱 Tech stack
 
-| Feature                       | Status          | Notes                                                        |
-| ----------------------------- | --------------- | ------------------------------------------------------------ |
-| Homepage                      | ✅ Complete     | Fully dynamic via CMS                                        |
-| About Page                    | ✅ Complete     | Fully dynamic via CMS                                        |
-| Therapist Directory           | ✅ Mostly done  | CMS integration and filter logic working, pagination pending |
-| Individual Therapist Profiles | ✅ Complete     | Linked from directory                                        |
-| Navigation (Header/Footer)    | ✅ Complete     | Fully functional                                             |
-| Blog / Library Layout         | ✅ Mostly done  | Categories & media hooked up, tags optional                  |
-| Contact Form                  | 🔄 Partially    | Backend form created, needs frontend integration             |
-| Therapist Signup Form         | 🔄 Partially    | Backend ready, frontend component pending                    |
-| Admin Approval System         | ❌ Not started  | CMS-level logic and UI needed                                |
-| Admin Auth                    | ✅ Complete     | Using Payload built-in                                       |
-| Therapist Auth                | ❌ Not started  | Needs implementing in Payload                                |
-| Email Notifications           | 🔄 Partially    | Setup started, requires production config                    |
-| SEO / Metadata                | ✅ Setup done   | `Head` tags in place, CMS driven                             |
-| Mobile Responsiveness         | ✅ Complete     | Fully tested                                                 |
-| Deployment Config             | ❌ Not started  | Will require `.env`, DNS, SMTP, etc                          |
-| Payment/Subscription          | 🔄 Out of scope | Placeholder strategy discussed (Stripe via external link)    |
+| Layer     | Choice                                     | Notes                                             |
+| --------- | ------------------------------------------ | ------------------------------------------------- |
+| Front-end | **Next.js 15 (App Router)**                | React 19, Server / Client Components, RSC caching |
+| Styling   | **MUI v6** + Emotion                       | Theme in `src/constants/theme.ts`                 |
+| CMS       | **Payload CMS** (`local: true`)            | runs inside Next serverless function              |
+| DB        | **PostgreSQL**                             | Prisma not needed – Payload owns schema           |
+| Mail      | Nodemailer (dev) \| SMTP / SendGrid (prod) |
+| Auth      | Payload local‑strategy, JWT cookie         |
+| Tests     | Jest, @testing-library/react, msw          |
+| Deploy    | **Vercel** (preview & prod)                | see _Deployment_                                  |
 
 ---
 
-## 🚧 Outstanding Tasks
+## 🔧 Environment variables
 
-- Create frontend form elements and wire up forms (contact, therapist signup) to frontend
-- Finalise auth tiers (admin vs therapist)
-- Add frontend for therapist application and admin approval workflow
-- Production email transport config (SMTP or SendGrid) if needed
-- Deployment setup and QA
-- Optional: Finish live preview implementation in cms
-- Add rest of unit testing
+| Variable                  | Required | Example / Notes                     |
+| ------------------------- | -------- | ----------------------------------- |
+| `DATABASE_URL`            | ✅       | `postgres://user:pass@host:5432/db` |
+| `PAYLOAD_SECRET`          | ✅       | Long random string                  |
+| `NEXT_PUBLIC_SITE_URL`    | ✅       | `http://localhost:3000` or prod URL |
+| `SMTP_HOST`               | ✓        | Mailgun / SES / etc.                |
+| `SMTP_PORT`               | ✓        | usually `587`                       |
+| `SMTP_USER` / `SMTP_PASS` | ✓        |                                     |
+| `APPROVAL_WEBHOOK_URL`    | optional | POSTs JSON when therapist approved  |
 
----
-
-## 🤝 Handover Support
-
-- 📞 1x 60-minute walkthrough call (on request)
-- 📝 Handover doc with outstanding tasks
-- 📂 Repo & CMS access: credentials to be provided on request
+See `.env.example` for the authoritative list.
 
 ---
 
-## 🙏 Final Notes
+## 📜 NPM scripts
 
-This project was developed with attention to performance, best practices, and modern tooling. Remaining features are scoped and achievable within \~10–15 developer days (if familiar with tech stack).
+| Command          | What it does                                         |
+| ---------------- | ---------------------------------------------------- |
+| `dev`            | `next dev` + Payload in local‑mode                   |
+| `build`          | `next build` (Payload initialises for type‑gen only) |
+| `start`          | `next start`                                         |
+| `generate:types` | `payload generate:schema-types --output src/types`   |
+| `test`           | Jest unit + component tests                          |
+| `lint`           | ESLint + Prettier                                    |
 
-The codebase should be straightforward for a developer familiar with React, Typescript & Next.js. Familiarity with Payload CMS would be a bonus.
+---
+
+## 🗄️ Payload CMS overview
+
+| Collection     | Purpose                                                               | Role‑based access                                                                                                                        |
+| -------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **users**      | Auth entities<br/>Fields: `email`, `name`, `role` (`admin│therapist`) | create ✅ • self read/update • admin CRUD                                                                                                |
+| **therapists** | Public profiles                                                       | - **owner** (relationship → users)<br/>- **approvalStatus** (`pending/approved/rejected`, sidebar)<br/>- Large profile schema (see file) | create ↳ logged‑in user<br/>read ↳ public if `approved`<br/>update/delete ↳ owner or admin |
+| **media**      | Images / uploads                                                      | default                                                                                                                                  |
+
+**Hooks**
+
+1. **`ensureSingleProfile`** – non‑admins can create _one_ therapist profile max.
+2. **`notifyApprovalChange`** – fires email + optional webhook when status flips.
+3. **`makeFirstUserAdmin`** (users) – first account becomes `admin`.
+
+---
+
+## 🔐 Auth & RBAC flow
+
+1. User hits **/signup** → Payload `POST /api/users/register`.
+2. Default role = `therapist`, first user created on new environment for website will be `admin`.
+3. They can now create a single `therapists` doc (`owner = user.id`, `approvalStatus = pending`).
+4. **Admin** sees pending items (sidebar field visible only to admins), toggles _Approved_.
+5. Hook emails the therapist and un‑hides the profile publicly.
+
+---
+
+## ✅ Testing
+
+```
+npm run test         # all suites
+npm run test -u      # update snapshots
+```
+
+- **Component** tests live next to components (`.test.tsx`).
+- MUI rendered with `createRender` helper to get Emotion SSR classes.
+- Mock server (`msw`) stands in for Payload REST calls.
+
+CI example (`.github/workflows/ci.yml`) included – runs lint + tests on PR.
+
+---
+
+## ☁️ Deploying on Vercel
+
+1. **Project → Settings → Environment Variables**  
+   add every key from `.env.example` (make sure `PAYLOAD_SECRET` + `DATABASE_URL`).
+2. In **Build & Output settings** leave default:
+   - Build command: `npm run build`
+   - Output dir: `.next`
+3. Add a **PostgreSQL** add‑on (Neon, Supabase, PlanetScale etc.) or point to an external cluster.
+4. (Optional) In `vercel.json` set
+   ```json
+   { "build": { "env": { "PAYLOAD_SKIP_INIT": "1" } } }
+   ```
+   to stop Payload contacting the DB during `next build`.
+5. Push → preview deploy → merge → production.
+
+### Self‑host
+
+Run `docker-compose up -d` using the provided stack in `ops/docker/*`  
+(Next.js server + Node mailer + Postgres 15).
+
+---
+
+## 🚧 Roadmap / outstanding work
+
+| Area                  | Todo                                                                                                           |
+| --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Forms**             | Front‑end for Contact & Therapist signup pages; wire to `/api` route calling Payload REST.                     |
+| **Admin UI**          | Surface `approvalStatus` in collection list (custom column) and investigate MUI theme override to match brand. |
+| **Directory filters** | Add pagination, combinable filters (age range + specialisms) backed by Payload GraphQL.                        |
+| **E‑mail**            | Switch to production transporter (SendGrid, Resend, SES).                                                      |
+| **Accessibility**     | Audit with Lighthouse + axe; improve colour contrast.                                                          |
+| **Payments**          | Out‑of‑scope placeholder: Stripe Checkout link in therapist profile.                                           |
+
+---
+
+## 🤝 Handover & support
+
+- 1 × 60 min live walkthrough (setup, codebase, deployment).
+- Slack / email Q&A for 14 days after hand‑off.
